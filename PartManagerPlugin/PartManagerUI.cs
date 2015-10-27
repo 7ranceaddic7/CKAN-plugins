@@ -29,6 +29,9 @@ namespace PartManagerPlugin
         private FilterType _mFilterType;
 	    private readonly List<PartViewer> _partViewers = new List<PartViewer>();
 
+	    private Timer _installationChangedTimer;
+	    private string lastGameDirectory;
+
         private void LoadConfig()
         {
             var fullPath = Path.Combine(Main.Instance.CurrentInstance.CkanDir(), ConfigPath);
@@ -85,9 +88,21 @@ namespace PartManagerPlugin
         {
             LoadConfig();
             RefreshInstalledModsList();
+			_installationChangedTimer = new Timer();
+			_installationChangedTimer.Tick += InstallationChangedTimer_Tick;
+	        _installationChangedTimer.Interval = 2000;
+			_installationChangedTimer.Start();
         }
 
-        public void OnModChanged(Module module, GUIModChangeType changeType)
+	    private void InstallationChangedTimer_Tick(object sender, EventArgs e)
+	    {
+		    if (Main.Instance.CurrentInstance.GameDir().Equals(lastGameDirectory)) return;
+		    RefreshInstalledModsList();
+			PartsGridView.Rows.Clear();
+		    lastGameDirectory = Main.Instance.CurrentInstance.GameDir();
+	    }
+
+        public void OnModChanged(CkanModule module, GUIModChangeType changeType)
         {
             if (changeType == GUIModChangeType.Update || changeType == GUIModChangeType.Install)
             {
