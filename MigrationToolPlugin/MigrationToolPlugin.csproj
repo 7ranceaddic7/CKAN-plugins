@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{43CB0F9C-FF6B-4D38-9839-BB9F3F0E9577}</ProjectGuid>
+    <ProjectGuid>{B781160C-49C6-4ED6-BD55-7B9493C75834}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MigrationToolPlugin</RootNamespace>
@@ -32,7 +32,7 @@
   <ItemGroup>
     <Reference Include="ckan, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Desktop\ckan.exe</HintPath>
+      <HintPath>G:\Games\Kerbal Space Program\ckan.exe</HintPath>
     </Reference>
     <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>

@@ -40,7 +40,7 @@ namespace PartManagerPlugin
 
         public override string GetName()
         {
-            return "Part Manager by nlight" + Environment.NewLine + "Updated by Gribbleshnibit8";
+            return "Part Manager by nlight, Updated by Gribbleshnibit8";
         }
 
         public override Version GetVersion()
