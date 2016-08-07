@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FilePruner.cs" />
     <Compile Include="PartsPrunerPlugin.cs" />
     <Compile Include="PartPrunerUI.cs">
       <SubType>UserControl</SubType>

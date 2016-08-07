@@ -29,16 +29,12 @@
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			this.prunerLbFileList = new System.Windows.Forms.ListBox();
 			this.tbLog = new System.Windows.Forms.TextBox();
-			this.prunerTlpButtonList = new System.Windows.Forms.TableLayoutPanel();
-			this.prunerBtnEdit = new System.Windows.Forms.Button();
-			this.prunerBtnRescan = new System.Windows.Forms.Button();
-			this.prunerBtnUnpruneSelected = new System.Windows.Forms.Button();
-			this.prunerBtnPruneSelected = new System.Windows.Forms.Button();
-			this.prunerBtnUnpruneAll = new System.Windows.Forms.Button();
-			this.prunerBtnPruneAll = new System.Windows.Forms.Button();
 			this.grpFiles = new System.Windows.Forms.GroupBox();
+			this.prunerDgvFileList = new System.Windows.Forms.DataGridView();
+			this.dgvColCheck = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+			this.dgvColName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
 			this.grpCreate = new System.Windows.Forms.GroupBox();
 			this.createTlpButtons = new System.Windows.Forms.TableLayoutPanel();
 			this.createBtnSave = new System.Windows.Forms.Button();
@@ -51,30 +47,14 @@
 			this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
 			this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
-			this.prunerTlpButtonList.SuspendLayout();
 			this.grpFiles.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.prunerDgvFileList)).BeginInit();
 			this.grpCreate.SuspendLayout();
 			this.createTlpButtons.SuspendLayout();
 			this.panelTlp.SuspendLayout();
 			this.createContextMenu.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
 			this.SuspendLayout();
-			// 
-			// prunerLbFileList
-			// 
-			this.prunerLbFileList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.prunerLbFileList.FormattingEnabled = true;
-			this.prunerLbFileList.Location = new System.Drawing.Point(6, 19);
-			this.prunerLbFileList.Name = "prunerLbFileList";
-			this.prunerLbFileList.ScrollAlwaysVisible = true;
-			this.prunerLbFileList.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.prunerLbFileList.Size = new System.Drawing.Size(284, 342);
-			this.prunerLbFileList.Sorted = true;
-			this.prunerLbFileList.TabIndex = 0;
-			this.prunerLbFileList.Click += new System.EventHandler(this.prunerLbFileList_Click);
-			this.prunerLbFileList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.prunerLbFileList_KeyDown);
 			// 
 			// tbLog
 			// 
@@ -89,101 +69,10 @@
 			this.tbLog.Size = new System.Drawing.Size(872, 260);
 			this.tbLog.TabIndex = 1;
 			// 
-			// prunerTlpButtonList
-			// 
-			this.prunerTlpButtonList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.prunerTlpButtonList.AutoSize = true;
-			this.prunerTlpButtonList.ColumnCount = 1;
-			this.prunerTlpButtonList.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.prunerTlpButtonList.Controls.Add(this.prunerBtnEdit, 0, 5);
-			this.prunerTlpButtonList.Controls.Add(this.prunerBtnRescan, 0, 4);
-			this.prunerTlpButtonList.Controls.Add(this.prunerBtnUnpruneSelected, 0, 3);
-			this.prunerTlpButtonList.Controls.Add(this.prunerBtnPruneSelected, 0, 2);
-			this.prunerTlpButtonList.Controls.Add(this.prunerBtnUnpruneAll, 0, 1);
-			this.prunerTlpButtonList.Controls.Add(this.prunerBtnPruneAll, 0, 0);
-			this.prunerTlpButtonList.Location = new System.Drawing.Point(296, 19);
-			this.prunerTlpButtonList.Name = "prunerTlpButtonList";
-			this.prunerTlpButtonList.RowCount = 6;
-			this.prunerTlpButtonList.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-			this.prunerTlpButtonList.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-			this.prunerTlpButtonList.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-			this.prunerTlpButtonList.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-			this.prunerTlpButtonList.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-			this.prunerTlpButtonList.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-			this.prunerTlpButtonList.Size = new System.Drawing.Size(131, 174);
-			this.prunerTlpButtonList.TabIndex = 2;
-			// 
-			// prunerBtnEdit
-			// 
-			this.prunerBtnEdit.Anchor = System.Windows.Forms.AnchorStyles.Left;
-			this.prunerBtnEdit.Enabled = false;
-			this.prunerBtnEdit.Location = new System.Drawing.Point(3, 145);
-			this.prunerBtnEdit.Name = "prunerBtnEdit";
-			this.prunerBtnEdit.Size = new System.Drawing.Size(125, 23);
-			this.prunerBtnEdit.TabIndex = 5;
-			this.prunerBtnEdit.Text = "Edit";
-			this.prunerBtnEdit.UseVisualStyleBackColor = true;
-			this.prunerBtnEdit.Click += new System.EventHandler(this.pruneBtnEdit_Click);
-			// 
-			// prunerBtnRescan
-			// 
-			this.prunerBtnRescan.Anchor = System.Windows.Forms.AnchorStyles.Left;
-			this.prunerBtnRescan.Location = new System.Drawing.Point(3, 115);
-			this.prunerBtnRescan.Name = "prunerBtnRescan";
-			this.prunerBtnRescan.Size = new System.Drawing.Size(125, 22);
-			this.prunerBtnRescan.TabIndex = 4;
-			this.prunerBtnRescan.Text = "Rescan Folder";
-			this.prunerBtnRescan.UseVisualStyleBackColor = true;
-			this.prunerBtnRescan.Click += new System.EventHandler(this.pruneBtnRescanFolder_Click);
-			// 
-			// prunerBtnUnpruneSelected
-			// 
-			this.prunerBtnUnpruneSelected.Anchor = System.Windows.Forms.AnchorStyles.Left;
-			this.prunerBtnUnpruneSelected.Location = new System.Drawing.Point(3, 87);
-			this.prunerBtnUnpruneSelected.Name = "prunerBtnUnpruneSelected";
-			this.prunerBtnUnpruneSelected.Size = new System.Drawing.Size(125, 22);
-			this.prunerBtnUnpruneSelected.TabIndex = 3;
-			this.prunerBtnUnpruneSelected.Text = "Unprune Selected";
-			this.prunerBtnUnpruneSelected.UseVisualStyleBackColor = true;
-			this.prunerBtnUnpruneSelected.Click += new System.EventHandler(this.pruneBtnUnpruneSelected_Click);
-			// 
-			// prunerBtnPruneSelected
-			// 
-			this.prunerBtnPruneSelected.Anchor = System.Windows.Forms.AnchorStyles.Left;
-			this.prunerBtnPruneSelected.Location = new System.Drawing.Point(3, 59);
-			this.prunerBtnPruneSelected.Name = "prunerBtnPruneSelected";
-			this.prunerBtnPruneSelected.Size = new System.Drawing.Size(125, 22);
-			this.prunerBtnPruneSelected.TabIndex = 2;
-			this.prunerBtnPruneSelected.Text = "Prune Selected";
-			this.prunerBtnPruneSelected.UseVisualStyleBackColor = true;
-			this.prunerBtnPruneSelected.Click += new System.EventHandler(this.pruneBtnPruneSelected_Click);
-			// 
-			// prunerBtnUnpruneAll
-			// 
-			this.prunerBtnUnpruneAll.Anchor = System.Windows.Forms.AnchorStyles.Left;
-			this.prunerBtnUnpruneAll.Location = new System.Drawing.Point(3, 31);
-			this.prunerBtnUnpruneAll.Name = "prunerBtnUnpruneAll";
-			this.prunerBtnUnpruneAll.Size = new System.Drawing.Size(125, 22);
-			this.prunerBtnUnpruneAll.TabIndex = 1;
-			this.prunerBtnUnpruneAll.Text = "Unprune All";
-			this.prunerBtnUnpruneAll.UseVisualStyleBackColor = true;
-			this.prunerBtnUnpruneAll.Click += new System.EventHandler(this.pruneBtnUnpruneAll_Click);
-			// 
-			// prunerBtnPruneAll
-			// 
-			this.prunerBtnPruneAll.Anchor = System.Windows.Forms.AnchorStyles.Left;
-			this.prunerBtnPruneAll.Location = new System.Drawing.Point(3, 3);
-			this.prunerBtnPruneAll.Name = "prunerBtnPruneAll";
-			this.prunerBtnPruneAll.Size = new System.Drawing.Size(125, 22);
-			this.prunerBtnPruneAll.TabIndex = 0;
-			this.prunerBtnPruneAll.Text = "Prune All";
-			this.prunerBtnPruneAll.UseVisualStyleBackColor = true;
-			this.prunerBtnPruneAll.Click += new System.EventHandler(this.pruneBtnPruneAll_Click);
-			// 
 			// grpFiles
 			// 
-			this.grpFiles.Controls.Add(this.prunerLbFileList);
-			this.grpFiles.Controls.Add(this.prunerTlpButtonList);
+			this.grpFiles.Controls.Add(this.prunerDgvFileList);
+			this.grpFiles.Controls.Add(this.checkedListBox1);
 			this.grpFiles.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.grpFiles.Location = new System.Drawing.Point(3, 3);
 			this.grpFiles.Name = "grpFiles";
@@ -191,6 +80,57 @@
 			this.grpFiles.TabIndex = 1;
 			this.grpFiles.TabStop = false;
 			this.grpFiles.Text = "Pruner Files";
+			// 
+			// prunerDgvFileList
+			// 
+			this.prunerDgvFileList.AllowUserToAddRows = false;
+			this.prunerDgvFileList.AllowUserToDeleteRows = false;
+			this.prunerDgvFileList.AllowUserToResizeRows = false;
+			this.prunerDgvFileList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.prunerDgvFileList.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
+			this.prunerDgvFileList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			this.prunerDgvFileList.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dgvColCheck,
+            this.dgvColName});
+			this.prunerDgvFileList.Location = new System.Drawing.Point(6, 19);
+			this.prunerDgvFileList.Name = "prunerDgvFileList";
+			this.prunerDgvFileList.RowHeadersVisible = false;
+			this.prunerDgvFileList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+			this.prunerDgvFileList.Size = new System.Drawing.Size(421, 367);
+			this.prunerDgvFileList.TabIndex = 3;
+			this.prunerDgvFileList.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.prunerDgvFileList_CellDoubleClick);
+			this.prunerDgvFileList.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.prunerDgvFileList_CellValueChanged);
+			this.prunerDgvFileList.CurrentCellDirtyStateChanged += new System.EventHandler(this.prunerDgvFileList_CurrentCellDirtyStateChanged);
+			this.prunerDgvFileList.KeyUp += new System.Windows.Forms.KeyEventHandler(this.prunerDgvFileList_KeyUp);
+			// 
+			// dgvColCheck
+			// 
+			this.dgvColCheck.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+			this.dgvColCheck.DataPropertyName = "Active";
+			this.dgvColCheck.FalseValue = "False";
+			this.dgvColCheck.HeaderText = "Pruned";
+			this.dgvColCheck.IndeterminateValue = "";
+			this.dgvColCheck.Name = "dgvColCheck";
+			this.dgvColCheck.TrueValue = "True";
+			this.dgvColCheck.Width = 47;
+			// 
+			// dgvColName
+			// 
+			this.dgvColName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+			this.dgvColName.DataPropertyName = "Name";
+			this.dgvColName.HeaderText = "Name";
+			this.dgvColName.Name = "dgvColName";
+			// 
+			// checkedListBox1
+			// 
+			this.checkedListBox1.FormattingEnabled = true;
+			this.checkedListBox1.Location = new System.Drawing.Point(6, 19);
+			this.checkedListBox1.Name = "checkedListBox1";
+			this.checkedListBox1.Size = new System.Drawing.Size(284, 364);
+			this.checkedListBox1.TabIndex = 4;
+			this.checkedListBox1.Visible = false;
 			// 
 			// grpCreate
 			// 
@@ -322,9 +262,8 @@
 			this.Name = "PartPrunerUi";
 			this.Size = new System.Drawing.Size(878, 664);
 			this.Load += new System.EventHandler(this.PartPrunerUI_Load);
-			this.prunerTlpButtonList.ResumeLayout(false);
 			this.grpFiles.ResumeLayout(false);
-			this.grpFiles.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.prunerDgvFileList)).EndInit();
 			this.grpCreate.ResumeLayout(false);
 			this.grpCreate.PerformLayout();
 			this.createTlpButtons.ResumeLayout(false);
@@ -337,14 +276,7 @@
 		}
 
 		#endregion
-		private System.Windows.Forms.ListBox prunerLbFileList;
 		private System.Windows.Forms.TextBox tbLog;
-		private System.Windows.Forms.TableLayoutPanel prunerTlpButtonList;
-		private System.Windows.Forms.Button prunerBtnRescan;
-		private System.Windows.Forms.Button prunerBtnUnpruneSelected;
-		private System.Windows.Forms.Button prunerBtnPruneSelected;
-		private System.Windows.Forms.Button prunerBtnUnpruneAll;
-		private System.Windows.Forms.Button prunerBtnPruneAll;
 		private System.Windows.Forms.TableLayoutPanel panelTlp;
 		private System.Windows.Forms.GroupBox grpFiles;
 		private System.Windows.Forms.GroupBox grpCreate;
@@ -352,12 +284,15 @@
 		private System.Windows.Forms.Button createBtnSave;
 		private System.Windows.Forms.Button createBtnClear;
 		private System.Windows.Forms.Label createLblDescription;
-		private System.Windows.Forms.Button prunerBtnEdit;
 		private System.Windows.Forms.ListBox createLbFiles;
 		private System.Windows.Forms.ContextMenuStrip createContextMenu;
 		private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
 		private System.Windows.Forms.SaveFileDialog saveFileDialog1;
 		private System.Windows.Forms.ToolTip toolTip1;
 		private System.IO.FileSystemWatcher fileSystemWatcher1;
+		private System.Windows.Forms.CheckedListBox checkedListBox1;
+		private System.Windows.Forms.DataGridView prunerDgvFileList;
+		private System.Windows.Forms.DataGridViewCheckBoxColumn dgvColCheck;
+		private System.Windows.Forms.DataGridViewTextBoxColumn dgvColName;
 	}
 }
