@@ -10,7 +10,7 @@ namespace ShipManagerPlugin
 		private readonly Version _version = new Version("v1.1.0");
 
 		// Variable to hold the current interface instance that will be added to the plugin's tab.
-		private PluginUI _mUi = null;
+		private PluginUi _mUi = null;
 
 		/// <summary>
 		/// Called by CKAN at load to set up the plugin.
@@ -21,7 +21,7 @@ namespace ShipManagerPlugin
 			var tabPage = new TabPage { Name = "ShipManager", Text = "Ship Manager" };
 
 			// Set the user control from this plugin to fill then add to the tab.
-			_mUi = new PluginUI { Dock = DockStyle.Fill };
+			_mUi = new PluginUi { Dock = DockStyle.Fill };
 			tabPage.Controls.Add(_mUi);
 
 			// Setup the callback, and add the tab to the CKAN tab controller. 

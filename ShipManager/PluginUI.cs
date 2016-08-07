@@ -5,55 +5,26 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
-using CKAN;
 
 namespace ShipManagerPlugin
 {
-	public partial class PluginUI : UserControl
+	public partial class PluginUi : UserControl
 	{
-		private List<CraftInfo> _crafts = new List<CraftInfo>();
+		private readonly CraftHandler _craftFileHandler = new CraftHandler();
 
-		private readonly List<string> _saves = new List<string>();
-
-		private readonly string _saveDir = Path.Combine(Main.Instance.CurrentInstance.GameDir(), "saves");
-
-		private readonly string _thumbsDir = Path.Combine(Main.Instance.CurrentInstance.GameDir(), "thumbs");
-
-		private readonly string _hangarDir = Path.Combine(Main.Instance.CurrentInstance.CkanDir(), "ShipManager");
-
-		private readonly string _hangerThumbsDir = Path.Combine(Main.Instance.CurrentInstance.CkanDir(), "ShipManager",
-			"thumbs");
-
-
-		public PluginUI()
+		public PluginUi()
 		{
 			InitializeComponent();
-
-			// Create hanger directories if they don't exist
-			if (!Directory.Exists(_hangarDir))
-			{
-				Directory.CreateDirectory(_hangarDir);
-				Directory.CreateDirectory(_hangerThumbsDir);
-				Directory.CreateDirectory(Path.Combine(_hangarDir, "Hangar", "Ships", "VAB"));
-				Directory.CreateDirectory(Path.Combine(_hangarDir, "Hangar", "Ships", "SPH"));
-			}
-
-			// Sets the view selection comboBox to the tile view option
-			cbListView.SelectedIndex = 0;
+			
+			cbDefaultSave.DataSource = _craftFileHandler.Saves;		// Binds the saves list to the save selection
+			cbListView.SelectedIndex = 0;   // Sets the view selection comboBox to the tile view option
 
 			// Get the ship thumbnail to show as the image for the CraftName column
 			olvcShipName.ImageGetter += rowObject => ((CraftInfo) rowObject).ThumbName;
 
-			// Override the default renderer so we don't get highlighted text
-			olvCraftList.DefaultRenderer = new HighlightTextRenderer
-			{
-				FillBrush = null,
-				FramePen = null
-			};
-
 			// Create drag and drop source and sink
 			olvCraftList.DragSource = new SimpleDragSource(true);
-			olvCraftList.DropSink = new SimpleDropSink()
+			olvCraftList.DropSink = new SimpleDropSink
 			{
 				CanDropOnItem = true,
 				FeedbackColor = Color.DarkOliveGreen,
@@ -71,153 +42,34 @@ namespace ShipManagerPlugin
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void PluginUI_Load(object sender, System.EventArgs e)
+		private void PluginUI_Load(object sender, EventArgs e)
 		{
-			GetAllCraftFromSaves();
-			GetAllCraftFromHangar();
-			olvCraftList.SetObjects(_crafts);
+
+			// Create hanger directories if they don't exist
+			if (!Directory.Exists(Util.HangarDir)) Directory.CreateDirectory(Util.HangarDir);
+			if (!Directory.Exists(Util.HangarSubDir)) Directory.CreateDirectory(Util.HangarSubDir);
+			if (!Directory.Exists(Path.Combine(Util.HangarDir, "VAB"))) Directory.CreateDirectory(Path.Combine(Util.HangarDir, "VAB"));
+			if (!Directory.Exists(Path.Combine(Util.HangarDir, "SPH"))) Directory.CreateDirectory(Path.Combine(Util.HangarDir, "SPH"));
+
+			olvCraftList.SmallImageList = _craftFileHandler.SmallImageList;
+			olvCraftList.LargeImageList = _craftFileHandler.LargeImageList;
+			olvCraftList.SetObjects(_craftFileHandler.Crafts);
+			olvCraftList.BuildList();
 		}
 
-
-		/// <summary>
-		/// Loads all craft from the saves folders.
-		/// </summary>
-		private void GetAllCraftFromSaves()
-		{
-			foreach (var saveFolder in Directory.GetDirectories(_saveDir, "*", SearchOption.TopDirectoryOnly))
-			{
-				var shipFolder = Path.Combine(saveFolder, "Ships");
-				if (!Directory.Exists(shipFolder)) continue;
-
-				// Get all the craft file from a save
-				var craftFiles = Directory.GetFiles(shipFolder, "*.craft", SearchOption.AllDirectories);
-
-				_saves.Add(Path.GetFileNameWithoutExtension(saveFolder));
-				GetCraftInFolder(craftFiles);
-				// G:\Games\Kerbal Space Program\Kerbal Space Program\saves\SaveName\Ships\*
-			}
-		}
-
-		/// <summary>
-		/// Loads all the craft stored in the Hangar folder.
-		/// </summary>
-		private void GetAllCraftFromHangar()
-		{
-			_saves.Add("Hangar");
-			var craftFiles = Directory.GetFiles(_hangarDir, "*.craft", SearchOption.AllDirectories);
-			GetCraftInFolder(craftFiles);
-			// G:\Games\Kerbal Space Program\Kerbal Space Program\CKAN\ShipManager\*
-		}
-
-		/// <summary>
-		/// Loads all craft files from a specific folder and adds them to the list view.
-		/// </summary>
-		/// <param name="craftFiles">Array of paths to craft files from a save.</param>		
-		private void GetCraftInFolder(string[] craftFiles)
-		{
-			foreach (var craft in craftFiles)
-			{
-				CraftInfo ci = new CraftInfo(craft);
-				AddCraft(ci);
-			}
-		}
-		/// <summary>
-		/// Copies an existing craft file from one save to another, copying the thumbnail if one exits.
-		/// </summary>
-		/// <param name="targetCraft">The drop target and destination of the copy.</param>
-		/// <param name="sourceCraft">Craft to be copied.</param>
-		private void CopyExistingCraft(CraftInfo targetCraft, CraftInfo sourceCraft)
-		{
-			// In the event that multiple files are selected from multiple saves, ensure that
-			// files from the current save aren't copied into themselves.
-			if (sourceCraft.SaveName.Equals(targetCraft.SaveName)) return;
-
-			try
-			{
-				// Get the path where the file needs to be copied, putting together the target save name, the craft's building, and the source file name.
-				var destinationPath = Path.Combine(GetPathToShipsFolder(targetCraft.SaveName), sourceCraft.Building, sourceCraft.FileName);
-				File.Copy(sourceCraft.FilePath, destinationPath);
-
-				// Create new craft model for the new location
-				var ci = new CraftInfo(destinationPath);
-
-				// Copy the existing thumbnail and rename it for the new save
-				var thumbOld = Path.Combine(_thumbsDir, sourceCraft.ThumbName);
-				var thumbNew = Path.Combine(_thumbsDir, ci.ThumbName);
-				if (!File.Exists(thumbNew))
-					File.Copy(thumbOld, thumbNew);
-
-				AddCraft(ci);
-			}
-			catch (IOException ex)
-			{ Console.WriteLine(ex.Message); }
-		}
-
-		/// <summary>
-		/// Copies a craft file from a non-KSP folder into a given save folder.
-		/// </summary>
-		/// <param name="targetSave"></param>
-		/// <param name="sourceCraftPath"></param>
-		private void CopyNewCraft(string targetSave, string sourceCraftPath)
-		{
-			try
-			{
-				CraftInfo craftData = new CraftInfo();
-				CraftInfo.GetCraftInfo(craftData, sourceCraftPath);
-
-				var destinationPath = Path.Combine(GetPathToShipsFolder(targetSave), craftData.Building, craftData.FileName);
-				File.Copy(destinationPath, sourceCraftPath);
-
-				var ci = new CraftInfo(destinationPath);
-				AddCraft(ci);
-			}
-			catch (IOException ex)
-			{ Console.WriteLine(ex.Message); }
-		}
-
-		/// <summary>
-		/// Adds thumbnail images for each craft to the imageLists and adds the craft to the crafts list.
-		/// </summary>
-		/// <param name="craft"></param>
-		private void AddCraft(CraftInfo craft)
-		{
-			_crafts.Add(craft);
-			olvCraftList.SmallImageList.Images.Add(craft.ThumbName, craft.Thumb);
-			olvCraftList.LargeImageList.Images.Add(craft.ThumbName, craft.Thumb);
-		}
-
-		/// <summary>
-		/// Takes a save name and returns a path to that save's 'Ships' folder.
-		/// </summary>
-		/// <param name="saveName"></param>
-		/// <returns></returns>
-		private string GetPathToShipsFolder(string saveName)
-		{
-			return Path.Combine(_saveDir, saveName, "ships");
-		}
+		
 
 		/// <summary>
 		/// Updates the ObjectListView's object set and tells it to redraw.
 		/// </summary>
 		private void UpdateList()
 		{
-			olvCraftList.SetObjects(_crafts);
-			olvCraftList.Refresh();
-		}
-
-
-		private string ShowSavesSelectionDialog()
-		{
-			var dialog = new SaveSelection(_saves);
-			dialog.ShowDialog(this);
-			var saveTo = dialog.Value;
-			dialog.Close();
-			return saveTo;
+			olvCraftList.BuildList();
 		}
 
 
 		#region Events
-		private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+		private void cbListView_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (cbListView.SelectedIndex == 0) olvCraftList.View = View.Tile;
 			else if (cbListView.SelectedIndex == 1) olvCraftList.View = View.Details;
@@ -233,13 +85,86 @@ namespace ShipManagerPlugin
 				TimedFilter(olvCraftList, "SPH");
 			if (button == rbBuildingVAB && button.Checked)
 				TimedFilter(olvCraftList, "VAB");
+			if (button == rbBuildingSubs && button.Checked)
+				TimedFilter(olvCraftList, "None");
 		}
 
 		private void tbFilter_TextChanged(object sender, EventArgs e)
 		{
 			TimedFilter(olvCraftList, tbFilter.Text);
 		}
+
+		private void rbFileAction_CheckedChanged(object sender, EventArgs e)
+		{
+			_craftFileHandler.OverwriteFiles = (sender as RadioButton).Checked;
+		}
+
+		private void btnRefresh_Click(object sender, EventArgs e)
+		{
+			_craftFileHandler.Reload();
+			UpdateList();
+		}
+
+		private void btnTransfer_Click(object sender, EventArgs e)
+		{
+			_craftFileHandler.CopyCraftToSave(_craftFileHandler.GetCraftInfosFromSave("Hangar"), SaveType.Save, cbDefaultSave.Text);
+			UpdateList();
+		}
+
+		/// <summary>
+		/// Sets right click menu when clicking on a list item
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void olvCraftList_CellRightClick(object sender, CellRightClickEventArgs e)
+		{
+			if (e.Model != null)
+				e.MenuStrip = cmsShip;
+			else
+				e.MenuStrip = cmsList;
+		}
 		#endregion Events
+
+
+		#region Context Menu Events
+		private void copyToHangarToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (olvCraftList.SelectedObjects.Count == 0) return;
+			_craftFileHandler.CopyCraftToSave(olvCraftList.SelectedObjects as List<CraftInfo>, SaveType.Hangar);
+			UpdateList();
+		}
+
+		private void copyToSaveToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (olvCraftList.SelectedObjects.Count == 0) return;
+			_craftFileHandler.CopyCraftToSave(olvCraftList.SelectedObjects as List<CraftInfo>, SaveType.Hangar, cbDefaultSave.Text);
+			UpdateList();
+		}
+
+		private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (olvCraftList.SelectedObjects.Count == 0) return;
+
+			if (MessageBox.Show("Delete all selected ships?\n\nThis cannot be undone!", "Confirm Delete!", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation,
+					MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+			{
+				_craftFileHandler.DeleteCraft(olvCraftList.SelectedObjects);
+			}
+			UpdateList();
+		}
+		
+		private void collapseAllGroupsToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			foreach (var olvGroup in olvCraftList.OLVGroups)
+				olvGroup.Collapsed = true;
+		}
+
+		private void expandAllGroupsToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			foreach (var olvGroup in olvCraftList.OLVGroups)
+				olvGroup.Collapsed = false;
+		}
+		#endregion Context Menu Events
 
 
 		#region Drop Events
@@ -263,16 +188,24 @@ namespace ShipManagerPlugin
 			}
 		}
 
+		/// <summary>
+		/// Handles dropping items from the list view on other items in the list view
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void olvCraftList_ModelDropped(object sender, ModelDropEventArgs e)
 		{
-			if (e.TargetModel == null)
-				return;
+			if (e.TargetModel == null) return;
 
-			foreach (CraftInfo sourceModel in e.SourceModels)
-				CopyExistingCraft(e.TargetModel as CraftInfo, sourceModel);
+			_craftFileHandler.CopyCraftToSave(e.SourceModels as List<CraftInfo>, SaveType.Save, (e.TargetModel as CraftInfo).SaveName);
 			UpdateList();
 		}
 
+		/// <summary>
+		/// Shows when an object can and cannot be dropped in the list view
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void olvCraftList_CanDrop(object sender, OlvDropEventArgs e)
 		{
 			// If object is a file, allow copy
@@ -280,20 +213,40 @@ namespace ShipManagerPlugin
 				e.Effect = DragDropEffects.Copy;
 		}
 
+		/// <summary>
+		/// Handles when external files are dropped into the list view
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void olvCraftList_Dropped(object sender, OlvDropEventArgs e)
 		{
-			if (!e.DragEventArgs.Data.GetDataPresent(DataFormats.FileDrop, false))
-				return;
+			if (!e.DragEventArgs.Data.GetDataPresent(DataFormats.FileDrop, false)) return;
 
-			var saveTo = ShowSavesSelectionDialog();
+			// File system list of paths of files dropped into the list view
+			var files = ((string[])e.DragEventArgs.Data.GetData(DataFormats.FileDrop)).ToList();
 
-			var files = (string[])e.DragEventArgs.Data.GetData(DataFormats.FileDrop);
-
-			foreach (var file in files)
-				CopyNewCraft(saveTo, file);
+			_craftFileHandler.CopyNewCraftToSave(files, cbDefaultSave.Text);
 			UpdateList();
 		}
 		#endregion Drop Events
+
+
+		#region Group Events
+		private void olvCraftList_GroupTaskClicked(object sender, GroupTaskClickedEventArgs e)
+		{
+
+		}
+
+		private void olvCraftList_GroupStateChanged(object sender, GroupStateChangedEventArgs e)
+		{
+
+		}
+
+		private void olvCraftList_GroupExpandingCollapsing(object sender, GroupExpandingCollapsingEventArgs e)
+		{
+			
+		}
+		#endregion Group Events
 
 
 		#region ObjectListView Helpers
@@ -326,18 +279,5 @@ namespace ShipManagerPlugin
 			olv.AdditionalFilter = filter;
 		}
 		#endregion ObjectListView Helpers
-
-		private void btnTransfer_Click(object sender, EventArgs e)
-		{
-			var saveTo = ShowSavesSelectionDialog();
-		}
-
-		private void btnRefresh_Click(object sender, EventArgs e)
-		{
-			_crafts = new List<CraftInfo>();
-			GetAllCraftFromSaves();
-			GetAllCraftFromHangar();
-			olvCraftList.SetObjects(_crafts);
-		}
 	}
 }

@@ -1,5 +1,7 @@
 ﻿using System.Drawing;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using CKAN;
 using ShipManagerPlugin.Properties;
 
@@ -12,22 +14,26 @@ namespace ShipManagerPlugin
 		public CraftInfo(string path)
 		{
 			FilePath = path;
-			SaveName = path.Split(Path.DirectorySeparatorChar)[path.Split(Path.DirectorySeparatorChar).Length - 4];
+			FileName = Path.GetFileName(path);
+			if (path.Contains("Subassemblies")) SaveName = path.Split(Path.DirectorySeparatorChar)[path.Split(Path.DirectorySeparatorChar).Length - 3];
+			else SaveName = path.Split(Path.DirectorySeparatorChar)[path.Split(Path.DirectorySeparatorChar).Length - 4];
 			GetCraftInfo(this, path);
 			Thumb = GetCraftThumb();
+
+			Hash = GetHash();
 		}
 
 		/// <summary>
 		/// CraftName of the craft file.
 		/// </summary>
-		public string CraftName { get; set; }
+		public string CraftName { get; private set; }
 
-		public string FileName => CraftName + ".craft";
+		public string FileName { get; private set; }
 
 		/// <summary>
 		/// Name of the save game the craft file belongs to.
 		/// </summary>
-		public string SaveName { get; set; }
+		public string SaveName { get; }
 
 		/// <summary>
 		/// Craft thumbnail.
@@ -42,7 +48,7 @@ namespace ShipManagerPlugin
 		/// <summary>
 		/// Full path to the craft file.
 		/// </summary>
-		public string FilePath { get; }
+		public string FilePath { get; private set; }
 
 		/// <summary>
 		/// What building this craft shows up in in-game.
@@ -55,15 +61,8 @@ namespace ShipManagerPlugin
 
 		public string Version { get; private set; }
 
+		public string Hash { get; private set; }
 
-		private Image GetCraftThumb()
-		{
-			var thumbPath = Path.Combine(Main.Instance.CurrentInstance.GameDir(), "thumbs", ThumbName);
-
-			if (File.Exists(thumbPath))
-				return Image.FromFile(thumbPath);
-			return Resources.defaultcapsule;
-		}
 
 		/// <summary>
 		/// Reads a craft file and gets extra info from it such as the description,
@@ -106,6 +105,44 @@ namespace ShipManagerPlugin
 
 			}
 			craft.PartCount = count.ToString();
+		}
+
+
+		public void UpdateCraftPath(string newPath)
+		{
+			if (File.Exists(newPath))
+				FilePath = newPath;
+		}
+
+		/// <summary>
+		/// Gets the thumbnail of a craft file.
+		/// </summary>
+		/// <returns>Returns the thumbnail if one exists, and the default icon otherwise</returns>
+		private Image GetCraftThumb()
+		{
+			var thumbPath = Path.Combine(Main.Instance.CurrentInstance.GameDir(), "thumbs", ThumbName);
+
+			if (File.Exists(thumbPath))
+				return Image.FromFile(thumbPath);
+			return Resources.defaultcapsule;
+		}
+
+		private string GetHash()
+		{
+			using (var md5 = MD5.Create())
+			{
+				using (var stream = File.OpenRead(FilePath))
+				{
+					return Encoding.Default.GetString(md5.ComputeHash(stream));
+				}
+			}
+		}
+
+
+
+		public bool Equals(CraftInfo toCompare)
+		{
+			return Hash.Equals(toCompare.Hash);
 		}
 	}
 }
